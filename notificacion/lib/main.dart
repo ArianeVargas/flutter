@@ -4,6 +4,26 @@ void main() {
   runApp(const MyApp());
 }
 
+class Vendedor {
+  final String nombre;
+  final String apellido;
+  final String cedula;
+  final String telefono;
+  final String usuario;
+  final String titulo;
+  final String descripcion;
+
+  Vendedor({
+    required this.nombre,
+    required this.apellido,
+    required this.cedula,
+    required this.telefono,
+    required this.usuario,
+    required this.titulo,
+    required this.descripcion,
+  });
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

@@ -1,15 +1,17 @@
-// ignore_for_file: library_private_types_in_public_api
-
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'inicio.dart';
+import 'register.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // ignore: use_key_in_widget_constructors
-  const MyApp({Key? key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +41,10 @@ class MyApp extends StatelessWidget {
 }
 
 class LoginForm extends StatefulWidget {
-  // ignore: use_key_in_widget_constructors
-  const LoginForm({Key? key});
+  const LoginForm({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginFormState createState() => _LoginFormState();
 }
 
@@ -50,7 +52,7 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login() {
+  void _login() async {
     String username = _usernameController.text;
     String password = _passwordController.text;
 
@@ -59,6 +61,35 @@ class _LoginFormState extends State<LoginForm> {
     }
     if (kDebugMode) {
       print('Password: $password');
+    }
+
+    final response = await http.post(
+      Uri.parse('https://transporte-el2a.onrender.com/api/vendedor/login'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, String>{
+        'usuario': username,
+        'contrasena': password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Si la solicitud es exitosa, puedes manejar la respuesta aquí
+      if (kDebugMode) {
+        print('Login exitoso: ${response.body}');
+      }
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Inicio()),  // Reemplace la pantalla actual con la pantalla de inicio
+    );
+    } else {
+      // Si la solicitud no es exitosa, puedes manejar el error aquí
+      if (kDebugMode) {
+        print('Error en el login: ${response.statusCode}');
+      }
+      // Puedes mostrar un mensaje de error al usuario si lo deseas
     }
   }
 
@@ -75,7 +106,7 @@ class _LoginFormState extends State<LoginForm> {
         TextField(
           controller: _usernameController,
           decoration: InputDecoration(
-            hintText: 'Usuario', 
+            hintText: 'Usuario',
             prefixIcon: const Icon(Icons.person),
             filled: true,
             fillColor: Colors.white,
@@ -89,7 +120,7 @@ class _LoginFormState extends State<LoginForm> {
           controller: _passwordController,
           obscureText: true,
           decoration: InputDecoration(
-            hintText: 'Contraseña', 
+            hintText: 'Contraseña',
             prefixIcon: const Icon(Icons.lock),
             filled: true,
             fillColor: Colors.white,
@@ -103,21 +134,38 @@ class _LoginFormState extends State<LoginForm> {
           onPressed: _login,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
-            padding: const EdgeInsets.symmetric(
-                vertical: 20.0, horizontal: 40.0), // Ajusta el tamaño del botón
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
           ),
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.login), // Icono "login"
-              SizedBox(
-                  width: 10.0), // Ajusta el espacio entre el icono y el texto
+              Icon(Icons.login),
+              SizedBox(width: 10.0),
               Text(
                 'Ingresar',
-                style:
-                    TextStyle(fontSize: 18.0), // Ajusta el tamaño de la fuente
+                style: TextStyle(fontSize: 18.0),
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 10.0),
+        TextButton(
+          onPressed: () {
+            if (kDebugMode) {
+              print('¿No tienes cuenta? Regístrate');
+            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Register()),
+            );
+          },
+          child: const Text(
+            '¿No tienes cuenta? Regístrate',
+            style: TextStyle(
+              color: Color.fromRGBO(237, 239, 241, 1),
+              fontSize: 17.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
